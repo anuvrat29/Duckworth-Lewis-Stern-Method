@@ -34,6 +34,6 @@ Ro is average value when w wickets remaining.
 
 ### •   Step 3: Perform prediction.
 
-1.  Tune L value (train).
+1.  Tune L value (train - one time process).
 2.  Observe graph by clicking view graph.
 3.  Now go for prediction.

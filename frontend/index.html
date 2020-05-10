@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+
+<html>
+    <head>
+        <link rel="icon" href="https://wallpapercave.com/wp/wp3725739.jpg" />
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+        <title> Duckworth Lewis </title>
+        <style>
+            h1 {
+                text-align: center;
+                padding-top: 0px;
+                color: aqua;
+            }
+            .img {
+                background-image: url("https://www.99sportz.com/wp-content/uploads/2019/11/pink-cricket-ball.jpg");
+                background-repeat: no-repeat;
+                background-attachment: fixed;
+                background-size: 100% 100%;
+            }
+            .container {
+                width: 100%;
+                height: 100%;
+            }
+            .toppane {
+                height: 20%;
+                width: 100%;
+                padding-top: 0.5%;
+            }
+            .bottompane {
+                width: 100%;
+                height: auto;
+                padding-top: 3%;
+                border-collapse: collapse;
+            }
+            #train-div, #predict-div {
+                display: none;
+            }
+            .button {
+                opacity: 0.9;
+                border: none;
+                color: white;
+                width: 200px;
+                cursor: pointer;
+                font-size: 13px;
+                margin: 4px 2px;
+                transition: 0.3s;
+                padding: 12px 30px;
+                text-align: center;
+                border-radius: 15px;
+                display: inline-block;
+                text-decoration: none;
+                background-color: #f4511e;
+            }
+            #pageloader {
+                display: none;
+                position: fixed;
+                cursor: wait;
+                z-index: +100 !important;
+            }
+            #pageloader img {
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                width: 80%;
+                height: 100%;
+                position: fixed;
+                padding-left: 10%;
+                padding-right: 10%;
+                text-align: center;
+                background-repeat: no-repeat !important;
+                background-color: rgba(255, 255, 255, 0.7);
+            }
+            .blink {
+                animation: blinker 1s linear infinite;
+                color: red;
+                font-size: 13px;
+                font-weight: bold;
+                font-family: sans-serif;
+            }
+            @keyframes blinker {
+                50% { opacity: 0.3; }
+            }
+            table {
+                border-collapse: separate;
+                border-spacing: 0 0.7em;
+            }
+            h1 {
+                text-align: center;
+                padding-top: 2px;
+            }
+            textarea {
+                resize: none;
+                background:transparent;
+                border: none;
+                text-align: center;
+                font-weight: bold;
+                font-family: "verdana";
+                font-size: 16pt;
+                color: black;
+            }
+        </style>
+    </head>
+
+    <body align="center" class="img">
+        
+        <div id="pageloader">
+            <img src="https://flevix.com/wp-content/uploads/2019/07/Bubble-Preloader-1.gif" alt="processing..." />
+        </div>
+        
+        <div class="container">
+
+            <div class="toppane" align="center">
+                <h1> Run Prediction By Duckworth Lewis Method </h1>
+            </div>
+
+            <div class="toppane" align="center">
+                <button id="train" class="button">Train & View the Graph</button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                <button id="predict" class="button">Predict</button>
+            </div>
+
+            <div class="bottompane">
+
+                <div align="center" id="train-div">
+                    <table>
+                        <tr>
+                            <th> <input type="submit" id="lvalue-button" class="button" value="Tune L value (Train)"> </th>
+                            <td> <input type="submit" id="graph-button" class="button" value="View Graph"> </td>
+                        </tr>
+                    </table>
+
+                    <div id="lvalue-div">
+                        <span id="lval"> </span>
+                    </div>
+
+                    <div id="graph-div">
+                        <span id="image"> </span>
+                    </div>
+                </div>
+
+                <div align="center" id="predict-div" style="{{style}}">
+                    <form id="myform" method="post" action="/anuvrat/dls/predict">
+                        <table>
+                            <tr align="left">
+                                <th> Enter Remaining Overs &nbsp;&nbsp;&nbsp;&nbsp;</th>
+                                <td> <input type="number" name="over" id="over" min="0" max="50" required> <span class="blink"> *Remaining Overs </span> </td>
+                            </tr>
+                            <tr align="left">
+                                <th> Enter Remaining Wickets &nbsp;&nbsp;&nbsp;&nbsp;</th>
+                                <td> <input type="number" name="wicket" id="wicket" min="0" max="10" required> <span class="blink"> *Remaining Wickets </span> </td>
+                            </tr>
+                            <tr align="center">
+                                <td colspan="2"> <input type="submit" id="predict-run" class="button" value="Predict Run"> </td>
+                            </tr>
+                        </table>
+                    </form>
+
+                    <div>
+                        <br/>
+                        <b> <textarea readonly cols=100 rows=4> {{data}} </textarea> </b>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+        
+        <script>
+            $(window).ready(function() {
+
+                $("#train").on("click", function() {
+                    $("#train-div").show();
+                    $("#predict-div").hide();
+                    $("#lvalue-div").hide();
+                    $("#graph-div").hide();
+                });
+
+                $("#predict").on("click", function() {
+                    $("#train-div").hide();
+                    $("#predict-div").show();
+                    $('textarea').val('');
+                });
+
+                $("#lvalue-button").on("click", function() {
+                    $("#graph-div").hide();
+                    $("#lvalue-div").show();
+                    $("#pageloader").fadeIn("slow");
+                    $.ajax({
+                        type: 'POST',
+                        url: '/anuvrat/dls/calculate',
+                        dataType: 'json',
+                        cache: false,
+                        success: function(data) {
+                            $("#lval").html("<b> <textarea readonly cols=100 rows=4> " + data.message + " </textarea> </b>");
+                            $("#pageloader").fadeOut("slow");
+                        }
+                    });
+                });
+
+                $("#graph-button").on("click", function() {
+                    $("#graph-div").show();
+                    $("#lvalue-div").hide();
+                    $("#pageloader").fadeIn();
+                    $("#image").html("<img src='/anuvrat/dls/viewgraph' width='650' height='440' alt='Graph is not available at Server Please train data.' />");
+                    $("#pageloader").fadeOut();
+                });
+            });
+        </script>
+    </body>
+</html>
